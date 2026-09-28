@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Поймай квадрат</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #17172f, #302b63);
+      color: white;
+    }
+
+    .game {
+      width: min(92vw, 650px);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin: 16px 0;
+      font-size: 18px;
+    }
+
+    #arena {
+      position: relative;
+      height: 420px;
+      overflow: hidden;
+      border: 3px solid #ffffff55;
+      border-radius: 18px;
+      background: #ffffff12;
+      box-shadow: 0 15px 40px #0005;
+    }
+
+    #target {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      display: none;
+      border: 0;
+      border-radius: 14px;
+      background: #ffcc00;
+      cursor: pointer;
+      box-shadow: 0 0 20px #ffcc00;
+      transition: transform 0.1s;
+    }
+
+    #target:active {
+      transform: scale(0.8);
+    }
+
+    button#start {
+      margin-top: 18px;
+      padding: 12px 25px;
+      border: 0;
+      border-radius: 10px;
+      background: #00d4ff;
+      color: #07111f;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button#start:hover {
+      background: #6eeaff;
+    }
+
+    #message {
+      min-height: 24px;
+      margin-top: 10px;
+      color: #d7ddff;
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <h1>Поймай квадрат</h1>
+    <p>Нажимай на жёлтый квадрат как можно больше раз за 30 секунд.</p>
+
+    <div class="info">
+      <span>Очки: <b id="score">0</b></span>
+      <span>Время: <b id="time">30</b></span>
+    </div>
+
+    <div id="arena">
+      <button id="target" aria-label="Поймать квадрат"></button>
+    </div>
+
+    <button id="start">Начать игру</button>
+    <div id="message"></div>
+  </main>
+
+  <script>
+    const arena = document.getElementById("arena");
+    const target = document.getElementById("target");
+    const startButton = document.getElementById("start");
+    const scoreElement = document.getElementById("score");
+    const timeElement = document.getElementById("time");
+    const message = document.getElementById("message");
+
+    let score = 0;
+    let time = 30;
+    let timer;
+    let playing = false;
+
+    function moveTarget() {
+      const maxX = arena.clientWidth - target.offsetWidth;
+      const maxY = arena.clientHeight - target.offsetHeight;
+
+      target.style.left = Math.random() * maxX + "px";
+      target.style.top = Math.random() * maxY + "px";
+    }
+
+    function finishGame() {
+      playing = false;
+      clearInterval(timer);
+      target.style.display = "none";
+      startButton.disabled = false;
+      startButton.textContent = "Играть снова";
+      message.textContent = `Игра окончена! Ты набрал очков: ${score}`;
+    }
+
+    function startGame() {
+      score = 0;
+      time = 30;
+      playing = true;
+
+      scoreElement.textContent = score;
+      timeElement.textContent = time;
+      message.textContent = "";
+      startButton.disabled = true;
+      startButton.textContent = "Игра идёт...";
+      target.style.display = "block";
+      moveTarget();
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        time--;
+        timeElement.textContent = time;
+
+        if (time <= 0) {
+          finishGame();
+        }
+      }, 1000);
+    }
+
+    target.addEventListener("click", () => {
+      if (!playing) return;
+
+      score++;
+      scoreElement.textContent = score;
+      moveTarget();
+    });
+
+    startButton.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
